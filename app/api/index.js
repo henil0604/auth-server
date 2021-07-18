@@ -31,12 +31,12 @@ const routes = [
         path: "/access",
         module: require("./access"),
         method: "post"
+    },
+    {
+        path: "/logout",
+        module: require("./logout"),
+        method: "post"
     }
-    // {
-    //     path: "/logout",
-    //     module: require("./logout"),
-    //     method: "post"
-    // }
 ]
 
 

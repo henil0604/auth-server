@@ -98,7 +98,6 @@ module.exports = async (req, res) => {
         avatar: data.avatar,
         createdAt: Date.now(),
         refreshToken: null,
-        accessToken: null,
         isLoggedIn: false,
         lastLogInAt: null,
     }

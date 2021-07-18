@@ -125,7 +125,6 @@ module.exports = async (req, res) => {
     const updated = await updateUser(findUserData, {
         $set: {
             refreshToken: tokens.refreshToken,
-            accessToken: tokens.accessToken,
             isLoggedIn: true,
             lastLogInAt: Date.now()
         }

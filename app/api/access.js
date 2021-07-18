@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
+const generateTokens = require("../helpers/generateTokens");
 const getUser = require("../helpers/getUser");
 const updateUser = require("../helpers/updateUser");
 
@@ -28,7 +29,7 @@ module.exports = async (req, res) => {
     try {
         const decodedRefreshToken = await jwt.verify(data.refreshToken, config.env.REFRESH_TOKEN_SECRET);
 
-        const user = await getUser({ id: decodedRefreshToken.id })
+        const user = await getUser({ id: decodedRefreshToken.id });
 
         if (user == null) {
             return resolve({
@@ -39,33 +40,47 @@ module.exports = async (req, res) => {
             }, 400)
         }
 
-        let updatedUser = await updateUser({ id: user.id }, {})
+        if (user.refreshToken != data.refreshToken) {
+            return resolve({
+                status: "error",
+                statusCode: 400,
+                message: "Invalid Refresh Token",
+                code: "invalid_refresh_token"
+            })
+        }
 
+        // creating the userdata for storing in token
+        let tokenData = {
+            username: user.username,
+            email: user.email,
+            method: user.method,
+            createdAt: user.createdAt,
+            id: user.id,
+            avatar: user.avatar,
+            lastLogInAt: user.lastLogInAt,
+            email_verified: user.email_verified
+        }
 
-        // // creating the userdata for storing in token
-        // let tokenData = {
-        //     username: user.username,
-        //     email: user.email,
-        //     method: user.method,
-        //     createdAt: user.createdAt,
-        //     id: user.id,
-        //     avatar: user.avatar,
-        //     lastLogInAt: user.lastLogInAt,
-        //     email_verified: user.email_verified
-        // }
+        const { accessToken } = generateTokens(tokenData);
 
-
-
-
+        resolve({
+            status: "success",
+            statusCode: 201,
+            message: "Successfully Generated Access Token",
+            code: "access_token_generated",
+            data: {
+                accessToken
+            }
+        })
 
     } catch (e) {
         return resolve({
             status: "error",
-            statusCode: 401,
+            statusCode: 400,
             message: "Invalid Refresh Token",
             code: "invalid_Refresh_token",
             err: e.message
-        }, 401)
+        }, 400)
     }
 
 

@@ -13,7 +13,6 @@ const config = require("./config");
 
 
 
-
 // listening to the app
 app.listen(config.server.PORT, () => {
     // Logging that app is listening on {PORT}
