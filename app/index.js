@@ -39,6 +39,8 @@ app.use(async (req, res, next) => {
 // Loading API route
 app.use("/api", require("./api"));
 
+// Loading scripts
+app.use("/scripts", require("./scripts"));
 
 
 app.use((req, res) => {

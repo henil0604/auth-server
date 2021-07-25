@@ -36,7 +36,7 @@ const routes = [
         path: "/logout",
         module: require("./logout"),
         method: "post"
-    }
+    },
 ]
 
 
@@ -45,6 +45,7 @@ router.get("/", (req, res) => {
     // Sending the Simple Hello to the client
     res.send("Hello From Auth-Server API");
 })
+
 
 // setting routes from routes array
 for (route of routes) {
