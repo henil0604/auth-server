@@ -137,7 +137,7 @@ module.exports = async (req, res) => {
     if (updated.err) {
         return resolve({
             status: "error",
-            code: 500,
+            statusCode: 500,
             message: "Failed to update your data",
             code: "mongo_update_failed"
         }, 500);
@@ -146,7 +146,8 @@ module.exports = async (req, res) => {
     // Sending success response
     return resolve({
         status: "success",
-        code: 201,
+        statusCode: 201,
+	code: "logged_in",
         message: "Logged In",
         data: tokens
     }, 200)

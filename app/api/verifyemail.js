@@ -104,6 +104,9 @@ module.exports = async (req, res) => {
             }, 500)
         }
 
+        if (req.query.redirect) {
+            return res.redirect(req.query.redirect);
+        }
 
         return resolve({
             status: "success",

@@ -1,5 +1,10 @@
+// importing cors
+const cors = require("cors");
+
 // creating router object
 const router = require("express").Router();
+
+router.use(cors());
 
 const routes = [
     {

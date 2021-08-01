@@ -5,7 +5,7 @@ const getUser = require("./getUser");
 const mongo = require("./mongo");
 const sendEmail = require("./sendEmail");
 
-module.exports = async (id) => {
+module.exports = async (id, redirectWhenVerify) => {
     return new Promise(async resolve => {
 
         let user = await getUser({ id });
@@ -52,6 +52,10 @@ module.exports = async (id) => {
             }
 
             let verificationLink = `${config.server.HOST}/api/verifyemail/${sessionId}`;
+
+            if (redirectWhenVerify) {
+                verificationLink += `?redirect=${redirectWhenVerify}`
+            }
 
             let emailSent = await sendEmail({
                 to: user.email,

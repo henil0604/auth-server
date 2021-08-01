@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
         }, 400)
     }
 
-    let emailSent = await sendEmailVerification(req.params.id);
+    let emailSent = await sendEmailVerification(req.params.id, req.query.redirectWhenVerify);
 
     return resolve(emailSent, emailSent.statusCode);
 }

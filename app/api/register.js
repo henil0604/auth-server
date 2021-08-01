@@ -115,7 +115,7 @@ module.exports = async (req, res) => {
         }, 500)
     }
 
-    let emailSent = await sendEmailVerification(finalData.id);
+    let emailSent = await sendEmailVerification(finalData.id, data.redirectWhenVerify);
 
     if (emailSent.status != "success") {
         return resolve(emailSent, emailSent.statusCode);
