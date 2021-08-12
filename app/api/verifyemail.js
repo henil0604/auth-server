@@ -2,17 +2,14 @@ const config = require("../../config");
 const getUser = require("../helpers/getUser");
 const mongo = require("../helpers/mongo");
 const updateUser = require("../helpers/updateUser");
+const setResolver = require("../helpers/resolver");
+
 
 
 module.exports = async (req, res) => {
 
     // Setting the resolver
-    const resolve = (data, statusCode = 200) => {
-        if (!res.headerSent) {
-            res.status(statusCode).json(data);
-            return data;
-        }
-    }
+    const resolve = setResolver(res);
 
     if (req.params.sessionId == undefined || req.params.sessionId == null || req.params.sessionId == "") {
         return resolve({

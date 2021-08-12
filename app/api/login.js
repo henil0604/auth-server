@@ -1,20 +1,14 @@
 const generateTokens = require("../helpers/generateTokens");
 const getUser = require("../helpers/getUser");
 const updateUser = require("../helpers/updateUser");
-const sendEmail = require("../helpers/sendEmail");
-const getTemplateHTML = require("../helpers/getTemplateHTML");
-const sendEmailVerification = require("../helpers/sendEmailVerification");
+const setResolver = require("../helpers/resolver");
+const addToken = require("../helpers/tokens/add");
 
 // exporting the module
 module.exports = async (req, res) => {
 
     // Setting the resolver
-    const resolve = (data, statusCode = 200) => {
-        if (!res.headerSent) {
-            res.status(statusCode).json(data);
-            return data;
-        }
-    }
+    const resolve = setResolver(res);
 
     // Setting the data
     let data = req.body;
@@ -121,6 +115,18 @@ module.exports = async (req, res) => {
     // generating tokens
     const tokens = generateTokens(tokenData);
 
+    // Adding tokens
+    let addedToken = await addToken(user.id, tokens.refreshToken);
+
+    if (addedToken.err != null) {
+        return resolve({
+            status: "error",
+            statusCode: 500,
+            message: "Failed to Add Refresh token",
+            code: "mongo_update_failed"
+        }, 500)
+    }
+
     // changing the state of user in database
     const updated = await updateUser(findUserData, {
         $set: {
@@ -147,7 +153,7 @@ module.exports = async (req, res) => {
     return resolve({
         status: "success",
         statusCode: 201,
-	code: "logged_in",
+        code: "logged_in",
         message: "Logged In",
         data: tokens
     }, 200)

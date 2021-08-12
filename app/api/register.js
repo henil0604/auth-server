@@ -3,17 +3,13 @@ const toolBox = require("@henil0604/toolbox");
 const getUser = require("../helpers/getUser");
 const addUser = require("../helpers/addUser");
 const sendEmailVerification = require("../helpers/sendEmailVerification");
+const setResolver = require("../helpers/resolver");
+const tokenInit = require("../helpers/tokens/init");
 
 // Exporting the module
 module.exports = async (req, res) => {
-
     // Setting the resolver
-    const resolve = (data, statusCode = 200) => {
-        if (!res.headerSent) {
-            res.status(statusCode).json(data);
-            return data;
-        }
-    }
+    const resolve = setResolver(res);
 
     let data = req.body;
 
@@ -97,10 +93,10 @@ module.exports = async (req, res) => {
         email_verified: false,
         avatar: data.avatar,
         createdAt: Date.now(),
-        refreshToken: null,
-        isLoggedIn: false,
         lastLogInAt: null,
     }
+
+    await tokenInit(finalData.id);
 
     // @debug
     // console.log(finalData)

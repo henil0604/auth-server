@@ -2,16 +2,15 @@ const jwt = require("jsonwebtoken");
 const config = require("../../config");
 const getUser = require("../helpers/getUser");
 const updateUser = require("../helpers/updateUser");
+const setResolver = require("../helpers/resolver");
+const removeToken = require("../helpers/tokens/remove");
+const getToken = require("../helpers/tokens/get");
+
 
 module.exports = async (req, res) => {
 
     // Setting the resolver
-    const resolve = (data, statusCode = 200) => {
-        if (!res.headerSent) {
-            res.status(statusCode).json(data);
-            return data;
-        }
-    }
+    const resolve = setResolver(res);
 
     // Setting the data
     let data = req.body;
@@ -29,9 +28,9 @@ module.exports = async (req, res) => {
     try {
         const decodedRefreshToken = await jwt.verify(data.refreshToken, config.env.REFRESH_TOKEN_SECRET);
 
-        const user = await getUser({ id: decodedRefreshToken.id });
+        const refreshToken = await getToken(decodedRefreshToken.id, data.refreshToken)
 
-        if (user == null) {
+        if (refreshToken.err != null || refreshToken.result == null) {
             return resolve({
                 status: "error",
                 statusCode: 400,
@@ -40,23 +39,9 @@ module.exports = async (req, res) => {
             }, 400)
         }
 
-        if (user.refreshToken != data.refreshToken) {
-            return resolve({
-                status: "error",
-                statusCode: 400,
-                message: "Invalid Refresh Token",
-                code: "invalid_Refresh_token",
-            }, 400)
-        }
+        let removedToken = await removeToken(decodedRefreshToken.id, data.refreshToken);
 
-        let updatedUser = await updateUser({ id: decodedRefreshToken.id }, {
-            $set: {
-                refreshToken: null,
-                isLoggedIn: false
-            }
-        })
-
-        if (updatedUser.err) {
+        if (removedToken.err) {
             return resolve({
                 status: "error",
                 statusCode: 500,
@@ -71,7 +56,6 @@ module.exports = async (req, res) => {
             message: "Logout Successfully",
             code: "logout_successful"
         }, 201);
-
 
 
     } catch (e) {

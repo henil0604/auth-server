@@ -10,6 +10,9 @@ const config = require("../config");
 const bodyParser = require("body-parser");
 // importing cookie-parser
 const cookieParser = require("cookie-parser");
+// importing path
+const path = require("path");
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -41,6 +44,14 @@ app.use("/api", require("./api"));
 
 // Loading scripts
 app.use("/scripts", require("./scripts"));
+
+app.use("/oauth", express.static(path.join(__dirname, "UI/public")))
+// app.get("/oauth", (req, res) => {
+//     res.sendFile('UI/public/index.html', { root: __dirname })
+// })
+
+
+
 
 
 app.use((req, res) => {

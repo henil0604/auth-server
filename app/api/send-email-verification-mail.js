@@ -1,14 +1,11 @@
 const sendEmailVerification = require("../helpers/sendEmailVerification")
+const setResolver = require("../helpers/resolver");
+
 
 module.exports = async (req, res) => {
 
     // Setting the resolver
-    const resolve = (data, statusCode = 200) => {
-        if (!res.headerSent) {
-            res.status(statusCode).json(data);
-            return data;
-        }
-    }
+    const resolve = setResolver(res);
 
 
     if (req.params.id == undefined || req.params.id == null || req.params.id == "") {

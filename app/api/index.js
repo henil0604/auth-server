@@ -42,6 +42,11 @@ const routes = [
         module: require("./logout"),
         method: "post"
     },
+    {
+        path: "/is-exists",
+        module: require("./is-exists"),
+        method: "post"
+    }
 ]
 
 

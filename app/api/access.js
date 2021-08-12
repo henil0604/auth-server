@@ -2,17 +2,13 @@ const jwt = require("jsonwebtoken");
 const config = require("../../config");
 const generateTokens = require("../helpers/generateTokens");
 const getUser = require("../helpers/getUser");
-const updateUser = require("../helpers/updateUser");
+const setResolver = require("../helpers/resolver");
+const getToken = require("../helpers/tokens/get");
 
 module.exports = async (req, res) => {
 
     // Setting the resolver
-    const resolve = (data, statusCode = 200) => {
-        if (!res.headerSent) {
-            res.status(statusCode).json(data);
-            return data;
-        }
-    }
+    const resolve = setResolver(res);
 
     // Setting the data
     let data = req.body;
@@ -20,7 +16,7 @@ module.exports = async (req, res) => {
     if (data.refreshToken == undefined || data.refreshToken == null || data.refreshToken == "") {
         return resolve({
             status: "error",
-            status_code: 400,
+            statusCode: 400,
             message: "Invalid Refresh token",
             code: "invalid_refresh_token"
         }, 400);
@@ -29,9 +25,9 @@ module.exports = async (req, res) => {
     try {
         const decodedRefreshToken = await jwt.verify(data.refreshToken, config.env.REFRESH_TOKEN_SECRET);
 
-        const user = await getUser({ id: decodedRefreshToken.id });
+        const refreshToken = await getToken(decodedRefreshToken.id, data.refreshToken)
 
-        if (user == null) {
+        if (refreshToken.err != null || refreshToken.result == null) {
             return resolve({
                 status: "error",
                 statusCode: 400,
@@ -40,14 +36,7 @@ module.exports = async (req, res) => {
             }, 400)
         }
 
-        if (user.refreshToken != data.refreshToken) {
-            return resolve({
-                status: "error",
-                statusCode: 400,
-                message: "Invalid Refresh Token",
-                code: "invalid_refresh_token"
-            })
-        }
+        let user = await getUser({ id: decodedRefreshToken.id })
 
         // creating the userdata for storing in token
         let tokenData = {
